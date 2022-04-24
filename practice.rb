@@ -1,8 +1,10 @@
 # DON'T CHANGE THIS CODE
 # ----------------------
+puts "What city are you in?"
+city = gets.chomp
 require "net/http"
 require "json"
-url = "https://weatherdbi.herokuapp.com/data/weather/chicago"
+url = "https://weatherdbi.herokuapp.com/data/weather/#{city}"
 uri = URI(url)
 response = Net::HTTP.get(uri)
 weather_data = JSON.parse(response)
@@ -34,11 +36,29 @@ weather_data = JSON.parse(response)
 
 # 1. inspect the weather_data hash
 # puts weather_data
+city_location = weather_data["region"]
+current_temp = weather_data["currentConditions"]["temp"]["c"]
+current_conditions = weather_data["currentConditions"]["comment"]
+
+puts "In #{city_location} it is currently #{current_temp} degrees and #{current_conditions}."
+
+# Print forecast for today
+today_weather_forecast = weather_data["next_days"][0]
+today_high = weather_data["next_days"][0]["max_temp"]["c"]
+today_conditions = weather_data["next_days"][0]["comment"]
+
+puts "The rest of today will be a high of #{today_high} and #{today_weather_forecast["comment"]}."
+
+# Print forecast for the rest of the week
+for daily_forecast_data in weather_data["next_days"]
+    day_of_week = daily_forecast_data["day"] 
+    temp_high = daily_forecast_data["max_temp"]["c"]
+    weather_conditions = daily_forecast_data["comment"]
+    puts "#{day_of_week}: a high of #{temp_high} and #{weather_conditions}."
+end
 
 # CHALLENGE
 # Can you display the weather forecast summary for a user-entered city?
 # Use the following code at the very top of the file and then replace "chicago" in the api url with the user-entered city:
-# puts "What city are you in?"
-# city = gets.chomp
-# puts city
+
 # Note: what happens if the user-entered value is not a known city? You'll want to do some error handling.
